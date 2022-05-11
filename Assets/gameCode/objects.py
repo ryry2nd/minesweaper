@@ -124,6 +124,8 @@ class Board:
                             self.board[x][y].isHidden = False
                         elif self.getNumFlags(x, y) >= self.getNumBombs(x, y):
                             self.selectArea(x, y)
+                        if self.board[x][y].num == 0:
+                            self.selectArea(x, y)
                     return
     
     def rClick(self, mousePos: tuple) -> None:
@@ -161,8 +163,8 @@ class Board:
                 if not(center) and not(outX) and not(outY) and self.board[localX][localY].isFlaged:
                     flags += 1    
         return flags
-    
-    def selectArea(self, x: int, y: int):
+
+    def selectArea(self, x: int, y: int) -> None:
         for x2 in range(-1, 2):
             for y2 in range(-1, 2):
                 localX = x + x2
@@ -171,12 +173,15 @@ class Board:
                 outY = localY >= self.board_res[1] or localY < 0
                 outX = localX >= self.board_res[0] or localX < 0
                 if not(center) and not(outX) and not(outY):
-                    if self.board[localX][localY].isBomb:
-                        self.showAll()
-                        self.board[localX][localY].isExploded = True
+                    square = self.board[localX][localY]
+                    if square.isBomb:
+                        if square.isFlaged:
+                            pass
+                        else:
+                            self.showAll()
+                            square.isExploded = True
                     else:
-                        self.board[localX][localY].isHidden = False
-                
+                        square.isHidden = False
 
     def reset(self) -> None:
         self.__init__(self.board_res, (self.WIDTH, self.HEIGHT), self.numBombs)
