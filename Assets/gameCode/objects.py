@@ -13,21 +13,12 @@ hiddenImg = pygame.image.load("Assets/textures/hidden.png")
 
 bombImg = pygame.image.load("Assets/textures/bomb.png")
 
+explodedBombImg = pygame.image.load("Assets/textures/explodedBomb.png")
+
+notABombImg = pygame.image.load("Assets/textures/notABomb.png")
+
 class TooManyBombs(Exception):
     pass
-
-def getNumBombs(x: int, y: int, board: list) -> int:
-        bombs = 0
-        for x2 in range(-1,2):
-            for y2 in range(-1,2):
-                localX = x+x2
-                localY = y+y2
-                center = x2 == 0 and y2 == 0
-                outY = localY >= len(board[0]) or localY < 0
-                outX = localX >= len(board) or localX < 0
-                if not(center) and not(outX) and not(outY) and board[localX][localY].isBomb:
-                    bombs+=1    
-        return bombs
 
 class Number:
     isHidden = True
@@ -38,7 +29,9 @@ class Number:
         self.rect = rect
 
     def draw(self, WIN: pygame.surface) -> None:
-        if self.isFlaged:
+        if not(self.isHidden) and self.isFlaged:
+            WIN.blit(notABombImg, self.rect)
+        elif self.isFlaged:
             WIN.blit(flagImg, self.rect)
         elif not self.isHidden:
             WIN.blit(numberImgs[self.num], self.rect)
@@ -49,11 +42,14 @@ class Bomb:
     isHidden = True
     isFlaged = False
     isBomb = True
+    isExploded = False
     def __init__(self, rect: pygame.Rect) -> None:
         self.rect = rect
 
     def draw(self, WIN: pygame.surface) -> None:
-        if self.isFlaged:
+        if self.isExploded:
+            WIN.blit(explodedBombImg, self.rect)
+        elif self.isFlaged:
             WIN.blit(flagImg, self.rect)
         elif not self.isHidden:
             WIN.blit(bombImg, self.rect)
@@ -62,7 +58,7 @@ class Bomb:
 
 class Board:
     def __init__(self, board_res: tuple, res: tuple, numBombs: int) -> None:
-        global numberImgs, bombImg, hiddenImg, flagImg
+        global numberImgs, bombImg, hiddenImg, flagImg, explodedBombImg, notABombImg
         if numBombs > (board_res[0]*board_res[1]):
             raise TooManyBombs("There can't be more bombs than pieces")
         
@@ -71,6 +67,8 @@ class Board:
         bombImg = pygame.transform.scale(bombImg, (res[1]/board_res[1], res[1]/board_res[1]))
         hiddenImg = pygame.transform.scale(hiddenImg, (res[1]/board_res[1], res[1]/board_res[1]))
         flagImg = pygame.transform.scale(flagImg, (res[1]/board_res[1], res[1]/board_res[1]))
+        explodedBombImg = pygame.transform.scale(explodedBombImg, (res[1]/board_res[1], res[1]/board_res[1]))
+        notABombImg = pygame.transform.scale(notABombImg, (res[1]/board_res[1], res[1]/board_res[1]))
 
         self.numBombs = numBombs
         self.WIDTH = res[0]
@@ -102,7 +100,7 @@ class Board:
         for x in range(board_res[0]):
             for y in range(board_res[1]):
                 if not self.board[x][y].isBomb:
-                    self.board[x][y].num = getNumBombs(x, y, self.board)
+                    self.board[x][y].num = self.getNumBombs(x, y)
 
     def showAll(self) -> None:
         for x in range(self.board_res[0]):
@@ -120,9 +118,12 @@ class Board:
                 if self.board[x][y].rect.collidepoint(mousePos) and not(self.board[x][y].isFlaged):
                     if self.board[x][y].isBomb:
                         self.showAll()
-
+                        self.board[x][y].isExploded = True
                     else:
-                        self.board[x][y].isHidden = False
+                        if self.board[x][y].isHidden:
+                            self.board[x][y].isHidden = False
+                        elif self.getNumFlags(x, y) >= self.getNumBombs(x, y):
+                            self.selectArea(x, y)
                     return
     
     def rClick(self, mousePos: tuple) -> None:
@@ -134,6 +135,48 @@ class Board:
                     else:
                         self.board[x][y].isFlaged = True
                     return
+
+    def getNumBombs(self, x: int, y: int) -> int:
+        bombs = 0
+        for x2 in range(-1,2):
+            for y2 in range(-1,2):
+                localX = x+x2
+                localY = y+y2
+                center = x2 == 0 and y2 == 0
+                outY = localY >= self.board_res[1] or localY < 0
+                outX = localX >= self.board_res[0] or localX < 0
+                if not(center) and not(outX) and not(outY) and self.board[localX][localY].isBomb:
+                    bombs+=1    
+        return bombs
     
+    def getNumFlags(self, x: int, y: int) -> int:
+        flags = 0
+        for x2 in range(-1,2):
+            for y2 in range(-1,2):
+                localX = x+x2
+                localY = y+y2
+                center = x2 == 0 and y2 == 0
+                outY = localY >= self.board_res[1] or localY < 0
+                outX = localX >= self.board_res[0] or localX < 0
+                if not(center) and not(outX) and not(outY) and self.board[localX][localY].isFlaged:
+                    flags += 1    
+        return flags
+    
+    def selectArea(self, x: int, y: int):
+        for x2 in range(-1, 2):
+            for y2 in range(-1, 2):
+                localX = x + x2
+                localY = y + y2
+                center = x2 == 0 and y2 == 0
+                outY = localY >= self.board_res[1] or localY < 0
+                outX = localX >= self.board_res[0] or localX < 0
+                if not(center) and not(outX) and not(outY):
+                    if self.board[localX][localY].isBomb:
+                        self.showAll()
+                        self.board[localX][localY].isExploded = True
+                    else:
+                        self.board[localX][localY].isHidden = False
+                
+
     def reset(self) -> None:
         self.__init__(self.board_res, (self.WIDTH, self.HEIGHT), self.numBombs)

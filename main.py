@@ -8,6 +8,7 @@ FPS = 60
 
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Minesweeper")
+pygame.display.set_icon(pygame.image.load("Assets/textures/bomb.png"))
 board = Board((10, 10), (WIDTH, HEIGHT), 10)
 clock = pygame.time.Clock()
 
