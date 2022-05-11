@@ -7,6 +7,8 @@ numberImgs = []
 for i in range(9):
     numberImgs.append(pygame.image.load(f"Assets/textures/number{i}.png"))
 
+flagImg = pygame.image.load("Assets/textures/flag.png")
+
 hiddenImg = pygame.image.load("Assets/textures/hidden.png")
 
 bombImg = pygame.image.load("Assets/textures/bomb.png")
@@ -36,7 +38,9 @@ class Number:
         self.rect = rect
 
     def draw(self, WIN: pygame.surface) -> None:
-        if not self.isHidden:
+        if self.isFlaged:
+            WIN.blit(flagImg, self.rect)
+        elif not self.isHidden:
             WIN.blit(numberImgs[self.num], self.rect)
         else:
             WIN.blit(hiddenImg, self.rect)
@@ -49,14 +53,16 @@ class Bomb:
         self.rect = rect
 
     def draw(self, WIN: pygame.surface) -> None:
-        if not self.isHidden:
+        if self.isFlaged:
+            WIN.blit(flagImg, self.rect)
+        elif not self.isHidden:
             WIN.blit(bombImg, self.rect)
         else:
             WIN.blit(hiddenImg, self.rect)
 
 class Board:
     def __init__(self, board_res: tuple, res: tuple, numBombs: int) -> None:
-        global numberImgs, bombImg, hiddenImg
+        global numberImgs, bombImg, hiddenImg, flagImg
         if numBombs > (board_res[0]*board_res[1]):
             raise TooManyBombs("There can't be more bombs than pieces")
         
@@ -64,11 +70,13 @@ class Board:
             numberImgs[i] = pygame.transform.scale(numberImgs[i], (res[1]/board_res[1], res[1]/board_res[1]))
         bombImg = pygame.transform.scale(bombImg, (res[1]/board_res[1], res[1]/board_res[1]))
         hiddenImg = pygame.transform.scale(hiddenImg, (res[1]/board_res[1], res[1]/board_res[1]))
+        flagImg = pygame.transform.scale(flagImg, (res[1]/board_res[1], res[1]/board_res[1]))
 
         self.numBombs = numBombs
         self.WIDTH = res[0]
         self.HEIGHT = res[1]
         self.board = []
+        self.board_res = board_res
         bombs = [[False for i in range(board_res[1])] for i in range(board_res[0])]
         
         for i in range(numBombs):
@@ -95,14 +103,37 @@ class Board:
             for y in range(board_res[1]):
                 if not self.board[x][y].isBomb:
                     self.board[x][y].num = getNumBombs(x, y, self.board)
+
+    def showAll(self) -> None:
+        for x in range(self.board_res[0]):
+            for y in range(self.board_res[1]):
+                self.board[x][y].isHidden = False
+
     def draw(self, WIN: pygame.surface) -> None:
         for x in self.board:
             for y in x:
                 y.draw(WIN)
     
-    def keyPress(self, mousePos: tuple) -> None:
-        for x in range(len(self.board)):
-            for y in range(len(self.board[0])):
-                if self.board[x][y].rect.collidepoint(mousePos):
-                    self.board[x][y].isHidden = False
-                    break
+    def lClick(self, mousePos: tuple) -> None:
+        for x in range(self.board_res[0]):
+            for y in range(self.board_res[1]):
+                if self.board[x][y].rect.collidepoint(mousePos) and not(self.board[x][y].isFlaged):
+                    if self.board[x][y].isBomb:
+                        self.showAll()
+
+                    else:
+                        self.board[x][y].isHidden = False
+                    return
+    
+    def rClick(self, mousePos: tuple) -> None:
+        for x in range(self.board_res[0]):
+            for y in range(self.board_res[1]):
+                if self.board[x][y].rect.collidepoint(mousePos) and self.board[x][y].isHidden:
+                    if self.board[x][y].isFlaged:
+                        self.board[x][y].isFlaged = False
+                    else:
+                        self.board[x][y].isFlaged = True
+                    return
+    
+    def reset(self) -> None:
+        self.__init__(self.board_res, (self.WIDTH, self.HEIGHT), self.numBombs)
