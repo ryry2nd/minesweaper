@@ -185,15 +185,16 @@ class Board:
         self.__init__(self.board_res, (self.WIDTH, self.HEIGHT), self.numBombs)
     
     def checkWin(self) -> None:
-        for i in self.board:
-            for ii in i:
-                if ii.isHidden and not ii.isBomb:
-                    return
-        for i in self.board:
-            for ii in i:
-                if ii.isBomb:
-                    ii.isFlaged = True
-        self.endGame()
+        if not self.isEnded:
+            for i in self.board:
+                for ii in i:
+                    if ii.isHidden and not ii.isBomb:
+                        return
+            for i in self.board:
+                for ii in i:
+                    if ii.isBomb:
+                        ii.isFlaged = True
+            self.endGame()
 
     def endGame(self) -> None:
         self.showAll()
