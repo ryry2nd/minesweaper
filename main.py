@@ -3,13 +3,15 @@ import pygame, sys
 
 pygame.init()
 
-WIDTH, HEIGHT = 600, 600
+RES = WIDTH, HEIGHT = 600, 600
+BOARDSIZE = (10, 10)
+AMOUNTBOMBS = 10
 FPS = 60
 
-WIN = pygame.display.set_mode((WIDTH, HEIGHT))
+WIN = pygame.display.set_mode(RES)
 pygame.display.set_caption("Minesweeper")
 pygame.display.set_icon(pygame.image.load("Assets/textures/bomb.png"))
-board = Board((10, 10), (WIDTH, HEIGHT), 10)
+board = Board(BOARDSIZE, RES, AMOUNTBOMBS)
 clock = pygame.time.Clock()
 
 while True:
