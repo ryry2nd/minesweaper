@@ -1,6 +1,7 @@
-import pygame, random
+import pygame, random, time
 
 pygame.init()
+pygame.font.init()
 
 numberImgs = []
 for i in range(9):
@@ -10,6 +11,8 @@ hiddenImg = pygame.image.load("Assets/textures/hidden.png")
 bombImg = pygame.image.load("Assets/textures/bomb.png")
 explodedBombImg = pygame.image.load("Assets/textures/explodedBomb.png")
 notABombImg = pygame.image.load("Assets/textures/notABomb.png")
+
+defaultFont = pygame.font.SysFont("Arial", 25)
 
 class TooManyBombs(Exception):
     pass
@@ -63,6 +66,8 @@ class Board:
         if numBombs > (board_res * board_res):
             raise TooManyBombs("There can't be more bombs than pieces")
 
+        self.startTime = time.time()
+        self.timeSoFar = 0
         self.headerHgt = 100
         self.isEnded = False
         self.numBombs = numBombs
@@ -96,6 +101,14 @@ class Board:
                 self.board[x][y].isHidden = False
 
     def draw(self, WIN: pygame.surface) -> None:
+        if not self.isEnded:
+            self.timeSoFar = round(time.time() - self.startTime)
+        second = self.timeSoFar % 60
+        minute = (self.timeSoFar - second) // 60
+        timeText = defaultFont.render("Time Playing:", True, (0, 0, 0))
+        timeText2 = defaultFont.render(f"{minute}:{second}", True, (0, 0, 0))
+        WIN.blit(timeText, (0, 0))
+        WIN.blit(timeText2, (0, 25))
         for x in self.board:
             for y in x:
                 y.draw(WIN)
