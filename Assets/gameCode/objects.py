@@ -41,6 +41,7 @@ class Bomb:
     isHidden = True
     isFlaged = False
     isBomb = True
+    win = True
     isExploded = False
     def __init__(self, rect: pygame.Rect, squareSize: int) -> None:
         self.rect = rect
@@ -188,7 +189,10 @@ class Board:
             for ii in i:
                 if ii.isHidden and not ii.isBomb:
                     return
-        
+        for i in self.board:
+            for ii in i:
+                if ii.isBomb:
+                    ii.isFlaged = True
         self.endGame()
 
     def endGame(self) -> None:
