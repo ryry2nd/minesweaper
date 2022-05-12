@@ -3,18 +3,12 @@ import pygame, random
 pygame.init()
 
 numberImgs = []
-
 for i in range(9):
     numberImgs.append(pygame.image.load(f"Assets/textures/number{i}.png"))
-
 flagImg = pygame.image.load("Assets/textures/flag.png")
-
 hiddenImg = pygame.image.load("Assets/textures/hidden.png")
-
 bombImg = pygame.image.load("Assets/textures/bomb.png")
-
 explodedBombImg = pygame.image.load("Assets/textures/explodedBomb.png")
-
 notABombImg = pygame.image.load("Assets/textures/notABomb.png")
 
 class TooManyBombs(Exception):
@@ -75,6 +69,7 @@ class Board:
         self.HEIGHT = res[1]
         self.board = []
         self.board_res = board_res
+        self.squareSize = res[1]/board_res[1]
         bombs = [[False for i in range(board_res[1])] for i in range(board_res[0])]
         
         for i in range(numBombs):
@@ -89,18 +84,19 @@ class Board:
             self.board.append([])
             for y in range(board_res[1]):
                 if bombs[x][y]:
-                    xPos = res[1]/board_res[1] * x
-                    yPos = res[1]/board_res[1] * y
-                    self.board[x].append(Bomb(pygame.Rect(xPos, yPos, res[1]/board_res[1], res[1]/board_res[1])))
+                    xPos = self.squareSize * x
+                    yPos = self.squareSize * y
+                    self.board[x].append(Bomb(pygame.Rect(xPos, yPos, self.squareSize, self.squareSize)))
                 else:
-                    xPos = res[1]/board_res[1] * x
-                    yPos = res[1]/board_res[1] * y
-                    self.board[x].append(Number(pygame.Rect(xPos, yPos, res[1]/board_res[1], res[1]/board_res[1])))
+                    xPos = self.squareSize * x
+                    yPos = self.squareSize * y
+                    self.board[x].append(Number(pygame.Rect(xPos, yPos, self.squareSize, self.squareSize)))
 
         for x in range(board_res[0]):
             for y in range(board_res[1]):
-                if not self.board[x][y].isBomb:
-                    self.board[x][y].num = self.getNumBombs(x, y)
+                square = self.board[x][y]
+                if not square.isBomb:
+                    square.num = self.getNumBombs(x, y)
 
     def showAll(self) -> None:
         for x in range(self.board_res[0]):
@@ -115,27 +111,26 @@ class Board:
     def lClick(self, mousePos: tuple) -> None:
         for x in range(self.board_res[0]):
             for y in range(self.board_res[1]):
-                if self.board[x][y].rect.collidepoint(mousePos) and not(self.board[x][y].isFlaged):
-                    if self.board[x][y].isBomb :
+                square = self.board[x][y]
+                if square.rect.collidepoint(mousePos) and not(square.isFlaged):
+                    if square.isBomb:
                         self.showAll()
-                        self.board[x][y].isExploded = True
-                    else:
-                        if self.board[x][y].isHidden:
-                            self.board[x][y].isHidden = False
-                        elif self.getNumFlags(x, y) >= self.getNumBombs(x, y):
-                            self.selectArea(x, y)
-                        if self.board[x][y].num == 0:
-                            self.selectArea(x, y)
+                        square.isExploded = True
+                        return
+                    elif square.isHidden:
+                        square.isHidden = False
+                    elif self.getNumFlags(x, y) >= self.getNumBombs(x, y):
+                        self.selectArea(x, y)
+                    if square.num == 0:
+                        self.selectArea(x, y)
                     return
     
     def rClick(self, mousePos: tuple) -> None:
         for x in range(self.board_res[0]):
             for y in range(self.board_res[1]):
-                if self.board[x][y].rect.collidepoint(mousePos) and self.board[x][y].isHidden:
-                    if self.board[x][y].isFlaged:
-                        self.board[x][y].isFlaged = False
-                    else:
-                        self.board[x][y].isFlaged = True
+                square = self.board[x][y]
+                if square.rect.collidepoint(mousePos) and square.isHidden:
+                    square.isFlaged = not square.isFlaged
                     return
 
     def getNumBombs(self, x: int, y: int) -> int:
@@ -188,7 +183,6 @@ class Board:
                             self.showAll()
                             square.isExploded = True
                             return
-                        
                         square.isHidden = False
                         if square.num == 0:
                             xy=[localX,localY]
