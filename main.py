@@ -3,8 +3,8 @@ import pygame, sys
 
 pygame.init()
 
-RES = WIDTH, HEIGHT = 600, 600
-BOARDSIZE = (10, 10)
+RES = WIDTH, HEIGHT = 600, 700
+BOARDSIZE = 10
 AMOUNTBOMBS = 10
 FPS = 60
 
@@ -27,5 +27,6 @@ while True:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_r:
                 board.reset()
+    WIN.fill((255, 255, 255))
     board.draw(WIN)
     pygame.display.update()
