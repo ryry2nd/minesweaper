@@ -165,6 +165,7 @@ class Board:
         return flags
 
     def selectArea(self, x: int, y: int) -> None:
+        emptiesToCheck = []
         for x2 in range(-1, 2):
             for y2 in range(-1, 2):
                 localX = x + x2
@@ -174,14 +175,20 @@ class Board:
                 outX = localX >= self.board_res[0] or localX < 0
                 if not(center) and not(outX) and not(outY):
                     square = self.board[localX][localY]
-                    if square.isBomb:
-                        if square.isFlaged:
-                            pass
-                        else:
+                    if square.isHidden and not square.isFlaged:    
+                        if square.isBomb:
                             self.showAll()
                             square.isExploded = True
-                    else:
-                        square.isHidden = False
+                        else:
+                            square.isHidden = False
+                    
+                        if square.num == 0:
+                            xy=[localX,localY]
+                            if xy not in emptiesToCheck:
+                                emptiesToCheck.append(xy)
+        while emptiesToCheck:
+            x, y = emptiesToCheck.pop()
+            self.selectArea(x, y)
 
     def reset(self) -> None:
         self.__init__(self.board_res, (self.WIDTH, self.HEIGHT), self.numBombs)
