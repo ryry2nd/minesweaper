@@ -116,7 +116,7 @@ class Board:
         for x in range(self.board_res[0]):
             for y in range(self.board_res[1]):
                 if self.board[x][y].rect.collidepoint(mousePos) and not(self.board[x][y].isFlaged):
-                    if self.board[x][y].isBomb:
+                    if self.board[x][y].isBomb :
                         self.showAll()
                         self.board[x][y].isExploded = True
                     else:
@@ -164,8 +164,16 @@ class Board:
                     flags += 1    
         return flags
 
+    emptiesToCheck = []
+
     def selectArea(self, x: int, y: int) -> None:
-        emptiesToCheck = []
+        self.emptiesToCheck.append([x,y])
+        while self.emptiesToCheck:
+            x, y = self.emptiesToCheck.pop()
+            self.selectSingleArea(x, y)
+        self.emptiesToCheck.clear()
+
+    def selectSingleArea(self, x: int, y: int) -> None:
         for x2 in range(-1, 2):
             for y2 in range(-1, 2):
                 localX = x + x2
@@ -175,20 +183,17 @@ class Board:
                 outX = localX >= self.board_res[0] or localX < 0
                 if not(center) and not(outX) and not(outY):
                     square = self.board[localX][localY]
-                    if square.isHidden and not square.isFlaged:    
+                    if square.isHidden and not square.isFlaged:
                         if square.isBomb:
                             self.showAll()
                             square.isExploded = True
-                        else:
-                            square.isHidden = False
-                    
+                            return
+                        
+                        square.isHidden = False
                         if square.num == 0:
                             xy=[localX,localY]
-                            if xy not in emptiesToCheck:
-                                emptiesToCheck.append(xy)
-        while emptiesToCheck:
-            x, y = emptiesToCheck.pop()
-            self.selectArea(x, y)
+                            if xy not in self.emptiesToCheck:
+                                self.emptiesToCheck.append(xy)
 
     def reset(self) -> None:
         self.__init__(self.board_res, (self.WIDTH, self.HEIGHT), self.numBombs)
