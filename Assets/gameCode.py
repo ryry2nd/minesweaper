@@ -11,6 +11,7 @@ hiddenImg = pygame.image.load("Assets/textures/hidden.png")
 bombImg = pygame.image.load("Assets/textures/bomb.png")
 explodedBombImg = pygame.image.load("Assets/textures/explodedBomb.png")
 notABombImg = pygame.image.load("Assets/textures/notABomb.png")
+resetImg = pygame.image.load("Assets/textures/reset.png")
 
 defaultFont = pygame.font.SysFont("Arial", 25)
 
@@ -76,6 +77,7 @@ class Board:
         self.boardHeight = res[1] - self.headerHgt
         self.board_res = board_res
         self.squareSize = self.boardHeight/self.board_res
+        self.resetRect = pygame.Rect(self.WIDTH//2, 0, self.headerHgt, self.headerHgt)
         self.board = [[Number(pygame.Rect(x*self.squareSize, y*self.squareSize + self.headerHgt, self.squareSize, self.squareSize), self.squareSize)
             for y in range(board_res)] for x in range(board_res)]
         
@@ -120,11 +122,16 @@ class Board:
         WIN.blit(defaultFont.render(f"{minute}:{second}", True, (0, 0, 0)), (0, 25))
         WIN.blit(defaultFont.render("Flags:", True, (0, 0, 0)), (self.WIDTH-100, 0))
         WIN.blit(defaultFont.render(str(self.flagsLeft()), True, (0, 0, 0)), (self.WIDTH-100, 25))
+        putTheNumberOn(WIN, resetImg, self.resetRect, self.headerHgt)
         for x in self.board:
             for y in x:
                 y.draw(WIN)
 
     def lClick(self, mousePos: tuple) -> None:
+        if self.resetRect.collidepoint(mousePos):
+            self.reset()
+            return
+
         for x in range(self.board_res):
             for y in range(self.board_res):
                 square = self.board[x][y]
