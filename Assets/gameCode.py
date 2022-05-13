@@ -1,4 +1,3 @@
-from turtle import width
 import pygame, random, time
 
 pygame.init()
@@ -62,16 +61,16 @@ class Bomb:
             putTheNumberOn(WIN, hiddenImg, self.rect, self.squareSize)
 
 class Board:
-    def __init__(self, board_res: int, res: tuple, numBombs: int) -> None:
+    def __init__(self, board_res: int, res: tuple) -> None:
         global numberImgs, bombImg, hiddenImg, flagImg, explodedBombImg, notABombImg
-        if numBombs > (board_res * board_res):
+        if (board_res**2)//10 > board_res ** 2:
             raise TooManyBombs("There can't be more bombs than pieces")
 
         self.startTime = time.time()
         self.timeSoFar = 0
-        self.headerHgt = 100
+        self.headerHgt = 50
         self.isEnded = False
-        self.numBombs = numBombs
+        self.numBombs = (board_res**2)//10
         self.res = self.WIDTH, self.HEIGHT = res
         self.boardWidth = res[0]
         self.boardHeight = res[1] - self.headerHgt
@@ -80,7 +79,7 @@ class Board:
         self.board = [[Number(pygame.Rect(x*self.squareSize, y*self.squareSize + self.headerHgt, self.squareSize, self.squareSize), self.squareSize)
             for y in range(board_res)] for x in range(board_res)]
         
-        for i in range(numBombs):
+        for i in range(self.numBombs):
             while True:
                 x = random.randint(0, board_res-1)
                 y = random.randint(0, board_res-1)
@@ -209,7 +208,7 @@ class Board:
                                 self.emptiesToCheck.append(xy)
 
     def reset(self) -> None:
-        self.__init__(self.board_res, self.res, self.numBombs)
+        self.__init__(self.board_res, self.res)
 
     def checkAllBombs(self) -> bool:
         for i in self.board:
