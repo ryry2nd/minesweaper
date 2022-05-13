@@ -1,3 +1,4 @@
+from turtle import width
 import pygame, random, time
 
 pygame.init()
@@ -99,16 +100,27 @@ class Board:
         for x in range(self.board_res):
             for y in range(self.board_res):
                 self.board[x][y].isHidden = False
+    
+    def flagsLeft(self) -> int:
+        numFlags = 0
+        for i in self.board:
+            for ii in i:
+                if ii.isFlaged:
+                    numFlags += 1
+        
+        return self.numBombs - numFlags
 
     def draw(self, WIN: pygame.surface) -> None:
         if not self.isEnded:
             self.timeSoFar = round(time.time() - self.startTime)
+            
         second = self.timeSoFar % 60
         minute = (self.timeSoFar - second) // 60
-        timeText = defaultFont.render("Time Playing:", True, (0, 0, 0))
-        timeText2 = defaultFont.render(f"{minute}:{second}", True, (0, 0, 0))
-        WIN.blit(timeText, (0, 0))
-        WIN.blit(timeText2, (0, 25))
+
+        WIN.blit(defaultFont.render("Time Playing:", True, (0, 0, 0)), (0, 0))
+        WIN.blit(defaultFont.render(f"{minute}:{second}", True, (0, 0, 0)), (0, 25))
+        WIN.blit(defaultFont.render("Flags Left:", True, (0, 0, 0)), (self.WIDTH-100, 0))
+        WIN.blit(defaultFont.render(str(self.flagsLeft()), True, (0, 0, 0)), (self.WIDTH-100, 25))
         for x in self.board:
             for y in x:
                 y.draw(WIN)
@@ -135,7 +147,7 @@ class Board:
         for x in range(self.board_res):
             for y in range(self.board_res):
                 square = self.board[x][y]
-                if square.rect.collidepoint(mousePos) and square.isHidden and not(self.isEnded):
+                if square.rect.collidepoint(mousePos) and square.isHidden and not(self.isEnded) and (self.flagsLeft() or square.isFlaged):
                     square.isFlaged = not square.isFlaged
                     self.checkWin()
                     return
@@ -198,18 +210,29 @@ class Board:
 
     def reset(self) -> None:
         self.__init__(self.board_res, self.res, self.numBombs)
-    
+
+    def checkAllBombs(self) -> bool:
+        for i in self.board:
+            for ii in i:
+                if (ii.isBomb and not ii.isFlaged):
+                    return False
+        return True
+
+    def checkAllNums(self) -> bool:
+        for i in self.board:
+            for ii in i:
+                if (ii.isHidden and not ii.isBomb):
+                    return False
+        return True
+
     def checkWin(self) -> None:
         if not self.isEnded:
-            for i in self.board:
-                for ii in i:
-                    if ii.isHidden and not ii.isBomb:
-                        return
-            for i in self.board:
-                for ii in i:
-                    if ii.isBomb:
-                        ii.isFlaged = True
-            self.endGame()
+            if self.checkAllBombs() or self.checkAllNums():
+                for i in self.board:
+                    for ii in i:
+                        if ii.isBomb:
+                            ii.isFlaged = True
+                self.endGame()
 
     def endGame(self) -> None:
         self.showAll()

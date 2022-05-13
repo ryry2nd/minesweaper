@@ -1,4 +1,4 @@
-from Assets.gameCode.objects import *
+from Assets.gameCode import *
 import pygame, sys
 
 pygame.init()
