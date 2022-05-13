@@ -111,10 +111,10 @@ class Board:
 
     def draw(self, WIN: pygame.surface) -> None:
         if not self.isEnded:
-            self.timeSoFar = round(time.time() - self.startTime)
+            self.timeSoFar = round(time.time() - self.startTime, 2)
             
         second = self.timeSoFar % 60
-        minute = (self.timeSoFar - second) // 60
+        minute = int(self.timeSoFar - second) // 60
 
         WIN.blit(defaultFont.render("Time Playing:", True, (0, 0, 0)), (0, 0))
         WIN.blit(defaultFont.render(f"{minute}:{second}", True, (0, 0, 0)), (0, 25))
@@ -123,7 +123,7 @@ class Board:
         for x in self.board:
             for y in x:
                 y.draw(WIN)
-    
+
     def lClick(self, mousePos: tuple) -> None:
         for x in range(self.board_res):
             for y in range(self.board_res):
