@@ -118,7 +118,7 @@ class Board:
 
         WIN.blit(defaultFont.render("Time Playing:", True, (0, 0, 0)), (0, 0))
         WIN.blit(defaultFont.render(f"{minute}:{second}", True, (0, 0, 0)), (0, 25))
-        WIN.blit(defaultFont.render("Flags Left:", True, (0, 0, 0)), (self.WIDTH-100, 0))
+        WIN.blit(defaultFont.render("Flags:", True, (0, 0, 0)), (self.WIDTH-100, 0))
         WIN.blit(defaultFont.render(str(self.flagsLeft()), True, (0, 0, 0)), (self.WIDTH-100, 25))
         for x in self.board:
             for y in x:
@@ -210,13 +210,6 @@ class Board:
     def reset(self) -> None:
         self.__init__(self.board_res, self.res)
 
-    def checkAllBombs(self) -> bool:
-        for i in self.board:
-            for ii in i:
-                if (ii.isBomb and not ii.isFlaged):
-                    return False
-        return True
-
     def checkAllNums(self) -> bool:
         for i in self.board:
             for ii in i:
@@ -226,7 +219,7 @@ class Board:
 
     def checkWin(self) -> None:
         if not self.isEnded:
-            if self.checkAllBombs() or self.checkAllNums():
+            if self.checkAllNums():
                 for i in self.board:
                     for ii in i:
                         if ii.isBomb:

@@ -3,7 +3,7 @@ import pygame, sys
 
 pygame.init()
 
-SIZE = 700
+SIZE = 600
 BOARDSIZE = 10
 FPS = 60
 
