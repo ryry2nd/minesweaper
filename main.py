@@ -1,11 +1,14 @@
 from threading import Thread
-import Assets, pygame, sys
+import Assets, pygame, sys, json
 
 pygame.init()
 
-SIZE = 600
-BOARDSIZE = 10
-FPS = 60
+with open("saves.json", 'r') as file:
+    saves = json.load(file)
+
+SIZE = saves["size"]
+BOARDSIZE = saves["boardSize"]
+FPS = saves["fps"]
 
 WIN = pygame.display.set_mode((SIZE, SIZE+50))
 pygame.display.set_caption("Minesweeper")
