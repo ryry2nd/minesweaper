@@ -1,25 +1,36 @@
+"""
+    sets the objects
+"""
+#imports
 from Assets.gameCode.vars import *
 import pygame, random, time
 
+#init
 pygame.init()
 pygame.font.init()
 
+#define the custom Exception
 class TooManyBombs(Exception):
     pass
 
+#transforms the image given
 def putTheNumberOn(WIN: pygame.Surface, img: pygame.image, rect: pygame.Rect, size: int) -> None:
     scaledImg = pygame.transform.scale(img, (size, size))
     WIN.blit(scaledImg, rect)
 
+#init number class
 class Number:
+    #init vars
     isHidden = True
     isFlagged = False
     isBomb = False
     num = None
+    #init class
     def __init__(self, rect: pygame.Rect, squareSize: int) -> None:
         self.rect = rect
         self.squareSize = squareSize
 
+    #draws the number
     def draw(self, WIN: pygame.Surface) -> None:
         if not(self.isHidden) and self.isFlagged:
             putTheNumberOn(WIN, notABombImg, self.rect, self.squareSize)
@@ -30,16 +41,20 @@ class Number:
         else:
             putTheNumberOn(WIN, hiddenImg, self.rect, self.squareSize)
 
+#init bomb class
 class Bomb:
+    #init vars
     isHidden = True
     isFlagged = False
     isBomb = True
     win = True
     isExploded = False
+    #init class
     def __init__(self, rect: pygame.Rect, squareSize: int) -> None:
         self.rect = rect
         self.squareSize = squareSize
 
+    #draws the bomb to the board
     def draw(self, WIN: pygame.Surface) -> None:
         if self.isExploded:
             putTheNumberOn(WIN, explodedBombImg, self.rect, self.squareSize)
@@ -50,7 +65,9 @@ class Bomb:
         else:
             putTheNumberOn(WIN, hiddenImg, self.rect, self.squareSize)
 
+#init board class
 class Board:
+    #init class
     def __init__(self, board_res: int, res: tuple) -> None:
         global numberImgs, bombImg, hiddenImg, flagImg, explodedBombImg, notABombImg
         if (board_res**2)//10 > board_res ** 2:
@@ -86,11 +103,13 @@ class Board:
                 if not square.isBomb:
                     square.num = self.getNumBombs(x, y)
 
+    #shows all of the hidden peaces
     def showAll(self) -> None:
         for x in range(self.board_res):
             for y in range(self.board_res):
                 self.board[x][y].isHidden = False
     
+    #returns the flags left
     def flagsLeft(self) -> int:
         numFlags = 0
         for i in self.board:
@@ -100,6 +119,7 @@ class Board:
         
         return self.numBombs - numFlags
 
+    #draws the board
     def draw(self, WIN: pygame.Surface) -> None:
         if not self.isEnded:
             self.timeSoFar = time.time() - self.startTime
@@ -116,6 +136,7 @@ class Board:
             for y in x:
                 y.draw(WIN)
 
+    #sets the left click action
     def lClick(self, mousePos: tuple) -> None:
         if self.resetRect.collidepoint(mousePos):
             self.reset()
@@ -138,6 +159,7 @@ class Board:
                     self.checkWin()
                     return
     
+    #sets the right click action
     def rClick(self, mousePos: tuple) -> None:
         for x in range(self.board_res):
             for y in range(self.board_res):
@@ -147,6 +169,7 @@ class Board:
                     self.checkWin()
                     return
 
+    #gets the number of bombs
     def getNumBombs(self, x: int, y: int) -> int:
         bombs = 0
         for x2 in range(-1,2):
@@ -160,6 +183,7 @@ class Board:
                     bombs+=1    
         return bombs
     
+    #gets the number of flags
     def getNumFlags(self, x: int, y: int) -> int:
         flags = 0
         for x2 in range(-1,2):
@@ -175,6 +199,7 @@ class Board:
 
     emptiesToCheck = []
 
+    #fills the area
     def selectArea(self, x: int, y: int) -> None:
         self.emptiesToCheck.append([x,y])
         while self.emptiesToCheck:
@@ -182,6 +207,7 @@ class Board:
             self.selectSingleArea(x, y)
         self.emptiesToCheck.clear()
 
+    #shows the 3 by 3 grid around the mouse
     def selectSingleArea(self, x: int, y: int) -> None:
         for x2 in range(-1, 2):
             for y2 in range(-1, 2):
@@ -203,9 +229,11 @@ class Board:
                             if xy not in self.emptiesToCheck:
                                 self.emptiesToCheck.append(xy)
 
+    #resets the game
     def reset(self) -> None:
         self.__init__(self.board_res, self.res)
 
+    #checks the numbers
     def checkAllNums(self) -> bool:
         for i in self.board:
             for ii in i:
@@ -213,6 +241,7 @@ class Board:
                     return False
         return True
 
+    #checks if there is a win
     def checkWin(self) -> None:
         if not self.isEnded:
             if self.checkAllNums():
@@ -222,6 +251,7 @@ class Board:
                             ii.isFlagged = True
                 self.endGame()
 
+    #ends the game
     def endGame(self) -> None:
         self.showAll()
         self.isEnded = True
