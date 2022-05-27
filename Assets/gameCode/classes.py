@@ -1,40 +1,29 @@
+from Assets.gameCode.vars import *
 import pygame, random, time
 
 pygame.init()
 pygame.font.init()
 
-numberImgs = []
-for i in range(9):
-    numberImgs.append(pygame.image.load(f"Assets/textures/number{i}.png"))
-flagImg = pygame.image.load("Assets/textures/flag.png")
-hiddenImg = pygame.image.load("Assets/textures/hidden.png")
-bombImg = pygame.image.load("Assets/textures/bomb.png")
-explodedBombImg = pygame.image.load("Assets/textures/explodedBomb.png")
-notABombImg = pygame.image.load("Assets/textures/notABomb.png")
-resetImg = pygame.image.load("Assets/textures/reset.png")
-
-defaultFont = pygame.font.SysFont("Arial", 25)
-
 class TooManyBombs(Exception):
     pass
 
-def putTheNumberOn(WIN: pygame.surface, img: pygame.image, rect: pygame.Rect, size: int) -> None:
+def putTheNumberOn(WIN: pygame.Surface, img: pygame.image, rect: pygame.Rect, size: int) -> None:
     scaledImg = pygame.transform.scale(img, (size, size))
     WIN.blit(scaledImg, rect)
 
 class Number:
     isHidden = True
-    isFlaged = False
+    isFlagged = False
     isBomb = False
     num = None
     def __init__(self, rect: pygame.Rect, squareSize: int) -> None:
         self.rect = rect
         self.squareSize = squareSize
 
-    def draw(self, WIN: pygame.surface) -> None:
-        if not(self.isHidden) and self.isFlaged:
+    def draw(self, WIN: pygame.Surface) -> None:
+        if not(self.isHidden) and self.isFlagged:
             putTheNumberOn(WIN, notABombImg, self.rect, self.squareSize)
-        elif self.isFlaged:
+        elif self.isFlagged:
             putTheNumberOn(WIN, flagImg, self.rect, self.squareSize)
         elif not self.isHidden:
             putTheNumberOn(WIN, numberImgs[self.num], self.rect, self.squareSize)
@@ -43,7 +32,7 @@ class Number:
 
 class Bomb:
     isHidden = True
-    isFlaged = False
+    isFlagged = False
     isBomb = True
     win = True
     isExploded = False
@@ -51,10 +40,10 @@ class Bomb:
         self.rect = rect
         self.squareSize = squareSize
 
-    def draw(self, WIN: pygame.surface) -> None:
+    def draw(self, WIN: pygame.Surface) -> None:
         if self.isExploded:
             putTheNumberOn(WIN, explodedBombImg, self.rect, self.squareSize)
-        elif self.isFlaged:
+        elif self.isFlagged:
             putTheNumberOn(WIN, flagImg, self.rect, self.squareSize)
         elif not self.isHidden:
             putTheNumberOn(WIN, bombImg, self.rect, self.squareSize)
@@ -106,12 +95,12 @@ class Board:
         numFlags = 0
         for i in self.board:
             for ii in i:
-                if ii.isFlaged:
+                if ii.isFlagged:
                     numFlags += 1
         
         return self.numBombs - numFlags
 
-    def draw(self, WIN: pygame.surface) -> None:
+    def draw(self, WIN: pygame.Surface) -> None:
         if not self.isEnded:
             self.timeSoFar = round(time.time() - self.startTime, 2)
             
@@ -135,7 +124,7 @@ class Board:
         for x in range(self.board_res):
             for y in range(self.board_res):
                 square = self.board[x][y]
-                if square.rect.collidepoint(mousePos) and not(square.isFlaged) and not(self.isEnded):
+                if square.rect.collidepoint(mousePos) and not(square.isFlagged) and not(self.isEnded):
                     if square.isBomb:
                         self.endGame()
                         square.isExploded = True
@@ -153,8 +142,8 @@ class Board:
         for x in range(self.board_res):
             for y in range(self.board_res):
                 square = self.board[x][y]
-                if square.rect.collidepoint(mousePos) and square.isHidden and not(self.isEnded) and (self.flagsLeft() or square.isFlaged):
-                    square.isFlaged = not square.isFlaged
+                if square.rect.collidepoint(mousePos) and square.isHidden and not(self.isEnded) and (self.flagsLeft() or square.isFlagged):
+                    square.isFlagged = not square.isFlagged
                     self.checkWin()
                     return
 
@@ -180,7 +169,7 @@ class Board:
                 center = x2 == 0 and y2 == 0
                 outY = localY >= self.board_res or localY < 0
                 outX = localX >= self.board_res or localX < 0
-                if not(center) and not(outX) and not(outY) and self.board[localX][localY].isFlaged:
+                if not(center) and not(outX) and not(outY) and self.board[localX][localY].isFlagged:
                     flags += 1    
         return flags
 
@@ -203,7 +192,7 @@ class Board:
                 outX = localX >= self.board_res or localX < 0
                 if not(center) and not(outX) and not(outY):
                     square = self.board[localX][localY]
-                    if square.isHidden and not square.isFlaged:
+                    if square.isHidden and not square.isFlagged:
                         if square.isBomb:
                             self.endGame()
                             square.isExploded = True
@@ -230,7 +219,7 @@ class Board:
                 for i in self.board:
                     for ii in i:
                         if ii.isBomb:
-                            ii.isFlaged = True
+                            ii.isFlagged = True
                 self.endGame()
 
     def endGame(self) -> None:

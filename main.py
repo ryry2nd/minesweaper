@@ -1,4 +1,4 @@
-from Assets.gameCode import *
+import Assets
 import pygame, sys
 
 pygame.init()
@@ -10,7 +10,7 @@ FPS = 60
 WIN = pygame.display.set_mode((SIZE, SIZE+50))
 pygame.display.set_caption("Minesweeper")
 pygame.display.set_icon(pygame.image.load("Assets/textures/bomb.png"))
-board = Board(BOARDSIZE, (SIZE, SIZE+50))
+board = Assets.Board(BOARDSIZE, (SIZE, SIZE+50))
 clock = pygame.time.Clock()
 
 while True:
