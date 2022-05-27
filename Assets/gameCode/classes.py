@@ -102,13 +102,13 @@ class Board:
 
     def draw(self, WIN: pygame.Surface) -> None:
         if not self.isEnded:
-            self.timeSoFar = round(time.time() - self.startTime, 2)
+            self.timeSoFar = time.time() - self.startTime
             
         second = self.timeSoFar % 60
         minute = int(self.timeSoFar - second) // 60
 
         WIN.blit(defaultFont.render("Time Playing:", True, (0, 0, 0)), (0, 0))
-        WIN.blit(defaultFont.render(f"{minute}:{second}", True, (0, 0, 0)), (0, 25))
+        WIN.blit(defaultFont.render(f"{minute:0>2}:{second:0>5.2f}", True, (0, 0, 0)), (0, 25))
         WIN.blit(defaultFont.render("Flags:", True, (0, 0, 0)), (self.WIDTH-100, 0))
         WIN.blit(defaultFont.render(str(self.flagsLeft()), True, (0, 0, 0)), (self.WIDTH-100, 25))
         putTheNumberOn(WIN, resetImg, self.resetRect, self.headerHgt)
