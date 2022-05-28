@@ -2,7 +2,7 @@
     inits images and fonts
 """
 #imports
-import pygame
+import pygame, json
 
 #init
 pygame.init()
@@ -22,5 +22,16 @@ resetImg = pygame.image.load("Assets/textures/reset.png")
 #init font
 defaultFont = pygame.font.SysFont("Arial", 25)
 
+#init vars
+with open("saves.json", 'r') as file:#get save file
+    saves = json.load(file)#convert to json
+
+SIZE = saves["size"]
+BOARDSIZE = saves["boardSize"]
+FPS = saves["fps"]
+WIN = pygame.display.set_mode((SIZE, SIZE+50))# sets window
+
 #sets what variables are to be sent when imported
-__all__ = ["numberImgs", "flagImg", "hiddenImg", "bombImg", "explodedBombImg", "notABombImg", "resetImg", "defaultFont"]
+__all__ = ["numberImgs", "flagImg", "hiddenImg", "bombImg", 
+    "explodedBombImg", "notABombImg", "resetImg", "defaultFont",
+    "SIZE", "BOARDSIZE", "FPS", "WIN"]
