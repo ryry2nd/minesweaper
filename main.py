@@ -34,14 +34,13 @@ def main():
             
         #if the box is clocked go to the find a game code
         elif clickWindow(WIN, (300, 100), "Join a", "Server"):
-            IP = getServer()#asks for the ip
-            if IP:
-                pass
-                #client(IP)# finds the ip
+            joinIp = getServer()#asks for the ip
+            if joinIp:
+                startClient(joinIp)# finds the ip
 
         #if the box is clicked make a server
         elif clickWindow(WIN, (500, 100), "Be a", "Server"):
-            pass
+            startServer()
 
         pygame.display.update()#update the display
         clock.tick(FPS)#fps

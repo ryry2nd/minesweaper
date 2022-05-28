@@ -3,7 +3,7 @@ gets the server
 """
 #imports
 import pygame, sys
-from Assets.gameCode.gui.inputIp import *
+from Assets.gameCode.gui.inputIp import InputIp
 from Assets.gameCode.backend.vars import *
 
 #inits
@@ -32,7 +32,7 @@ def getServer():
                 if event.key == pygame.K_ESCAPE:# if escape is pressed, escape
                     return False
                 elif event.key == pygame.K_RETURN:# if return is pressed return the letters
-                    return IP
+                    return inputL.get()
                 else:#otherwise add the key
                     inputL.addkey(event.key)
 
