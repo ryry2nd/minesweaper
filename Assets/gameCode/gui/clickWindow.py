@@ -2,7 +2,7 @@
     sets the click window function
 """
 #imports
-from Assets.gameCode.vars import *
+from Assets.gameCode.backend.vars import *
 import pygame
 
 #window function

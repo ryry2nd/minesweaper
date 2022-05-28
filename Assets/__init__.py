@@ -4,7 +4,8 @@
     you import Assets
 """
 #imports
-from Assets.gameCode.objects import Board
-from Assets.gameCode.singleplayer import startSingleplayer
-from Assets.gameCode.vars import *
-from Assets.gameCode.clickWindow import clickWindow
+from Assets.gameCode.game.objects import Board
+from Assets.gameCode.game.singleplayer import startSingleplayer
+from Assets.gameCode.backend.vars import *
+from Assets.gameCode.gui.clickWindow import clickWindow
+from Assets.gameCode.gui.getServer import getServer

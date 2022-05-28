@@ -2,6 +2,7 @@
     inits images and fonts
 """
 #imports
+from Assets.gameCode.backend.getLocalIp import getLocalIp
 import pygame, json
 
 #init
@@ -30,8 +31,9 @@ SIZE = saves["size"]
 BOARDSIZE = saves["boardSize"]
 FPS = saves["fps"]
 WIN = pygame.display.set_mode((SIZE, SIZE+50))# sets window
+IP = getLocalIp()
 
 #sets what variables are to be sent when imported
 __all__ = ["numberImgs", "flagImg", "hiddenImg", "bombImg", 
     "explodedBombImg", "notABombImg", "resetImg", "defaultFont",
-    "SIZE", "BOARDSIZE", "FPS", "WIN"]
+    "SIZE", "BOARDSIZE", "FPS", "WIN", "IP"]

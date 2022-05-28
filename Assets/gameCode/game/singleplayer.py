@@ -3,8 +3,8 @@
 """
 #imports
 from threading import Thread
-from Assets.gameCode.vars import *
-from Assets.gameCode.objects import Board
+from Assets.gameCode.backend.vars import *
+from Assets.gameCode.game.objects import Board
 import pygame, sys
 
 #init vars

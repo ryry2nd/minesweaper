@@ -2,7 +2,7 @@
     sets the objects
 """
 #imports
-from Assets.gameCode.vars import *
+from Assets.gameCode.backend.vars import *
 import pygame, random, time
 
 #init
