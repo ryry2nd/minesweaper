@@ -6,6 +6,19 @@ import socket, sys, pickle, pygame
 
 playerConn = []
 
+def getEvents(conn: socket.socket, board: Board):
+    conn.settimeout(0.01)
+    try:
+        event = pickle.loads(conn.recv(512))
+        if event[0] == 0:
+            board.lClick(event[1])
+        elif event[0] == 1:
+            board.rClick(event[1])
+        elif event[0] == 2:
+            board.reset()
+    except TimeoutError:
+        pass
+
 def look4Players(s: socket.socket):
     global playerConn
     while True:
@@ -97,6 +110,9 @@ def startServer():
                 #escape
                 elif event.key == pygame.K_ESCAPE:
                     break
+        
+        for conn in playerConn:
+            getEvents(conn, board)
 
         WIN.fill((255, 255, 255))
         board.draw(WIN)

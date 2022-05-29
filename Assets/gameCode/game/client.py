@@ -72,15 +72,15 @@ def startClient(joinIp: str):
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 #left click
                 if pygame.mouse.get_pressed()[0]:
-                    pass#board.lClick(pygame.mouse.get_pos())
+                    server.sendall(pickle.dumps((0, pygame.mouse.get_pos())))
                 #right click
                 elif pygame.mouse.get_pressed()[2]:
-                    pass#board.rClick(pygame.mouse.get_pos())
+                    server.sendall(pickle.dumps((1, pygame.mouse.get_pos())))
             #keys
             elif event.type == pygame.KEYDOWN:
                 #reset board
                 if event.key == pygame.K_r:
-                    pass#board.reset()
+                    server.sendall(pickle.dumps((2)))
                 #escape
                 elif event.key == pygame.K_ESCAPE:
                     return
