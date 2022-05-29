@@ -174,7 +174,7 @@ class Board:
                 outY = localY >= self.board_res or localY < 0
                 outX = localX >= self.board_res or localX < 0
                 if not(center) and not(outX) and not(outY) and self.board[localX][localY].isBomb:
-                    bombs+=1    
+                    bombs+=1
         return bombs
     
     #gets the number of flags

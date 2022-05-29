@@ -24,9 +24,9 @@ def sendBoard(board) -> list:
         for y in range(len(board[0])):
             piece = board[x][y]
             if piece.isHidden:
-                piece.isBomb = False
-                piece.num = None
-            retBoard[x].append((piece.rect, piece.squareSize, piece.isHidden, piece.isFlagged, piece.num, piece.isExploded, piece.isBomb))
+                retBoard[x].append((piece.rect, piece.squareSize, piece.isHidden, piece.isFlagged, None, piece.isExploded, False))
+            else:
+                retBoard[x].append((piece.rect, piece.squareSize, piece.isHidden, piece.isFlagged, piece.num, piece.isExploded, piece.isBomb))
     return retBoard
 
 def startServer():
@@ -45,10 +45,14 @@ def startServer():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 s.close()
+                for conn in playerConn:
+                    conn.close()
                 sys.exit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     s.close()
+                    for conn in playerConn:
+                        conn.close()
                     return
         
         WIN.fill((0, 0, 0))

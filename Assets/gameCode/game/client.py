@@ -13,10 +13,12 @@ def recvBoard(board) -> list:
             retBoard[x].append(Piece.convertData(board[x][y]))
     return retBoard
 
-
 def updateLoading(server: socket.socket):
     global loading
-    loading = pickle.loads(server.recv(4))
+    try:
+        loading = pickle.loads(server.recv(4))
+    except EOFError:
+        loading = None
 
 def startClient(joinIp: str):
     server = socket.socket()
@@ -33,13 +35,16 @@ def startClient(joinIp: str):
                 sys.exit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    server.shutdown()
+                    server.close()
                     return
 
         WIN.fill((0, 0, 0))
         WIN.blit(ipFont.render("Joining game", True, (255, 255, 255)), (0, 0))
         pygame.display.update()
         clock.tick(FPS)
+    
+    if loading == None:
+        return
     
     while True:
         try:
