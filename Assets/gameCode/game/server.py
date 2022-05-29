@@ -63,16 +63,18 @@ def startServer():
         pygame.display.update()
     
     s.close()
-
     for conn in playerConn:
-        conn.send(pickle.dumps(False))
+        try:
+            conn.send(pickle.dumps(False))
+        except ConnectionResetError:
+            playerConn.remove(conn)
     
     while True:
         for conn in playerConn:
             try:
                 conn.sendall(pickle.dumps((sendBoard(board.board), board.isEnded, board.timeSoFar)))
             except ConnectionResetError:
-                pass
+                playerConn.remove(conn)
 
         #get events
         for event in pygame.event.get():

@@ -1,6 +1,7 @@
 from threading import Thread
 from Assets.gameCode.backend.vars import *
 from Assets.gameCode.backend.objects import Board, Piece
+from Assets.gameCode.gui.errors import *
 import pygame, socket, pickle, sys
 
 loading = True
@@ -19,10 +20,19 @@ def updateLoading(server: socket.socket):
         loading = pickle.loads(server.recv(4))
     except EOFError:
         loading = None
+    except ConnectionAbortedError:
+        return
 
 def startClient(joinIp: str):
     server = socket.socket()
-    server.connect((joinIp, PORT))
+    try:
+        server.connect((joinIp, PORT))
+    except socket.gaierror:
+        ipNotFound(WIN)
+        return
+    except ConnectionRefusedError:
+        ipNotFound(WIN)
+        return
 
     br, bs = pickle.loads(server.recv(1024))
     board = Board(br, bs, False)
@@ -32,6 +42,7 @@ def startClient(joinIp: str):
     while loading:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                server.close()
                 sys.exit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -61,15 +72,15 @@ def startClient(joinIp: str):
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 #left click
                 if pygame.mouse.get_pressed()[0]:
-                    board.lClick(pygame.mouse.get_pos())
+                    pass#board.lClick(pygame.mouse.get_pos())
                 #right click
                 elif pygame.mouse.get_pressed()[2]:
-                    board.rClick(pygame.mouse.get_pos())
+                    pass#board.rClick(pygame.mouse.get_pos())
             #keys
             elif event.type == pygame.KEYDOWN:
                 #reset board
                 if event.key == pygame.K_r:
-                    board.reset()
+                    pass#board.reset()
                 #escape
                 elif event.key == pygame.K_ESCAPE:
                     return
