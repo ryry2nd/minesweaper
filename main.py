@@ -10,7 +10,6 @@ pygame.init()#init
 #init pygame window
 pygame.display.set_caption("Minesweeper")#sets caption
 pygame.display.set_icon(pygame.image.load("Assets/textures/bomb.png"))#sets icon
-clock = pygame.time.Clock()#sets clock
 
 #main function
 def main():

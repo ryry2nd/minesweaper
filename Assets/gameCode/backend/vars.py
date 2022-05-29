@@ -33,6 +33,7 @@ resetImg = pygame.image.load("Assets/textures/reset.png")
 
 #init font
 defaultFont = pygame.font.SysFont("Arial", 25)
+ipFont = pygame.font.SysFont("Arial", 50)
 
 #init vars
 with open("saves.json", 'r') as file:#get save file
@@ -43,8 +44,11 @@ BOARDSIZE = saves["boardSize"]
 FPS = saves["fps"]
 WIN = pygame.display.set_mode((SIZE, SIZE+50))# sets window
 IP = getLocalIp()
+PORT = 2531
+clock = pygame.time.Clock()#sets clock
 
 #sets what variables are to be sent when imported
 __all__ = ["numberImgs", "flagImg", "hiddenImg", "bombImg", 
     "explodedBombImg", "notABombImg", "resetImg", "defaultFont",
-    "SIZE", "BOARDSIZE", "FPS", "WIN", "IP"]
+    "SIZE", "BOARDSIZE", "FPS", "WIN", "IP", "PORT", "clock",
+    "ipFont"]

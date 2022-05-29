@@ -9,7 +9,6 @@ import pygame, sys
 
 #init vars
 board = Board(BOARDSIZE, (SIZE, SIZE+50))#sets board
-clock = pygame.time.Clock()#sets clock
 
 #draws the display
 def drawDisplay():

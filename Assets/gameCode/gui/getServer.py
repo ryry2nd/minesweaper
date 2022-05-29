@@ -18,9 +18,6 @@ SERVER_TEXT = defaultFont.render(
 def getServer():
     inputL = InputIp()#inits the ip class
 
-    #define vars
-    clock = pygame.time.Clock()
-
     #game loop
     while True:
         clock.tick(FPS)#fps
