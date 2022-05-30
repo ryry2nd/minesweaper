@@ -21,7 +21,7 @@ def updateLoading(server: socket.socket):
     except EOFError:
         loading = None
     except ConnectionAbortedError:
-        return
+        loading = None
 
 def startClient(joinIp: str):
     server = socket.socket()

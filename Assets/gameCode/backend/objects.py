@@ -77,7 +77,7 @@ class Board:
         self.boardWidth = res[0]
         self.boardHeight = res[1] - self.headerHgt
         self.board_res = board_res
-        self.squareSize = self.boardHeight/self.board_res
+        self.squareSize = self.boardHeight//self.board_res
         self.resetRect = pygame.Rect(self.WIDTH//2, 0, self.headerHgt, self.headerHgt)
         self.board = [[Piece(pygame.Rect(x*self.squareSize, y*self.squareSize + self.headerHgt, self.squareSize, self.squareSize), self.squareSize)
             for y in range(board_res)] for x in range(board_res)]
