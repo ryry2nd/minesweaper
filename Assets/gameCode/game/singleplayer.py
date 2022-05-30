@@ -7,20 +7,18 @@ from Assets.gameCode.backend.vars import *
 from Assets.gameCode.backend.objects import Board
 import pygame, sys
 
-#init vars
-board = Board(BOARDSIZE, (SIZE, SIZE+50))#sets board
-
 #draws the display
-def drawDisplay():
+def drawDisplay(board: Board):
     WIN.fill((255, 255, 255))#fills the window with white
     board.draw(WIN)#draws the board
     pygame.display.update()#updates the display
 
 #main function
 def startSingleplayer():
+    board = Board(BOARDSIZE, (SIZE, SIZE+50))#sets board
     #game loop
     while True:
-        displayThread = Thread(target=drawDisplay)#init thread
+        displayThread = Thread(target=drawDisplay, args=(board, ))#init thread
         displayThread.start()#start thread
 
         #get events
@@ -46,5 +44,4 @@ def startSingleplayer():
                     return
 
         clock.tick(FPS)#fps
-
         displayThread.join()#joins the thread

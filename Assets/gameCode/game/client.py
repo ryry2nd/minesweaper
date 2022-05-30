@@ -6,6 +6,11 @@ import pygame, socket, pickle, sys
 
 loading = True
 
+def updateScreen(board: Board):
+    WIN.fill((255, 255, 255))
+    board.draw(WIN)
+    pygame.display.update()
+
 def recvBoard(board) -> list:
     retBoard = []
     for x in range(len(board)):
@@ -58,6 +63,8 @@ def startClient(joinIp: str):
         return
     
     while True:
+        scrThread = Thread(target=updateScreen, args=(board, ))
+        scrThread.start()
         try:
             tempB, board.isEnded, board.timeSoFar = pickle.loads(server.recv(16384))
             board.board = recvBoard(tempB)
@@ -85,7 +92,5 @@ def startClient(joinIp: str):
                 elif event.key == pygame.K_ESCAPE:
                     return
 
-        WIN.fill((255, 255, 255))
-        board.draw(WIN)
-        pygame.display.update()
         clock.tick(FPS)
+        scrThread.join()

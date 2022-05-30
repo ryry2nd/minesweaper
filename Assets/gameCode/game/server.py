@@ -6,6 +6,11 @@ import socket, sys, pickle, pygame
 
 playerConn = []
 
+def drawBoard(board: Board):
+    WIN.fill((255, 255, 255))
+    board.draw(WIN)
+    pygame.display.update()
+
 def getEvents(conn: socket.socket, board: Board):
     conn.settimeout(0.01)
     try:
@@ -30,7 +35,7 @@ def look4Players(s: socket.socket):
         playerConn.append(conn)
         conn.sendall(pickle.dumps((BOARDSIZE, (SIZE, SIZE+50))))
 
-def sendBoard(board) -> list:
+def sendBoard(board: Board) -> list:
     retBoard = []
     for x in range(len(board)):
         retBoard.append([])
@@ -83,6 +88,8 @@ def startServer():
             playerConn.remove(conn)
     
     while True:
+        drawThread = Thread(target=drawBoard, args=(board, ))
+        drawThread.start()
         for conn in playerConn:
             try:
                 conn.sendall(pickle.dumps((sendBoard(board.board), board.isEnded, board.timeSoFar)))
@@ -114,11 +121,8 @@ def startServer():
         for conn in playerConn:
             getEvents(conn, board)
 
-        WIN.fill((255, 255, 255))
-        board.draw(WIN)
-        pygame.display.update()
-
         clock.tick(FPS)
+        drawThread.join()
     
     for conn in playerConn:
         conn.close()
