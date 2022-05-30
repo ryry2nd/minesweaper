@@ -3,13 +3,13 @@
 """
 #imports
 from Assets import *
-import pygame, sys
+import pygame, sys, os
 
 pygame.init()#init
 
 #init pygame window
 pygame.display.set_caption("Minesweeper")#sets caption
-pygame.display.set_icon(pygame.image.load("Assets/textures/bomb.png"))#sets icon
+pygame.display.set_icon(pygame.image.load(os.path.join("Assets", "textures", "bomb.png")))#sets icon
 
 #main function
 def main():

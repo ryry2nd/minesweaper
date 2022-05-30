@@ -2,7 +2,7 @@
     inits images and fonts
 """
 #imports
-import pygame, json, socket
+import pygame, json, socket, os
 
 #init
 pygame.init()
@@ -23,13 +23,13 @@ def getLocalIp():
 #init images
 numberImgs = []
 for i in range(9):
-    numberImgs.append(pygame.image.load(f"Assets/textures/number{i}.png"))
-flagImg = pygame.image.load("Assets/textures/flag.png")
-hiddenImg = pygame.image.load("Assets/textures/hidden.png")
-bombImg = pygame.image.load("Assets/textures/bomb.png")
-explodedBombImg = pygame.image.load("Assets/textures/explodedBomb.png")
-notABombImg = pygame.image.load("Assets/textures/notABomb.png")
-resetImg = pygame.image.load("Assets/textures/reset.png")
+    numberImgs.append(pygame.image.load(os.path.join("Assets", "textures", f"number{i}.png")))
+flagImg = pygame.image.load(os.path.join("Assets", "textures", "flag.png"))
+hiddenImg = pygame.image.load(os.path.join("Assets", "textures", "hidden.png"))
+bombImg = pygame.image.load(os.path.join("Assets", "textures", "bomb.png"))
+explodedBombImg = pygame.image.load(os.path.join("Assets", "textures", "explodedBomb.png"))
+notABombImg = pygame.image.load(os.path.join("Assets", "textures", "notABomb.png"))
+resetImg = pygame.image.load(os.path.join("Assets", "textures", "reset.png"))
 
 #init font
 defaultFont = pygame.font.SysFont("Arial", 25)
