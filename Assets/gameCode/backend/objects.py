@@ -2,7 +2,7 @@
     sets the objects
 """
 #imports
-from Assets.gameCode.vars import *
+from Assets.gameCode.backend.vars import *
 import pygame, random, time
 
 #init
@@ -18,62 +18,57 @@ def putTheNumberOn(WIN: pygame.Surface, img: pygame.image, rect: pygame.Rect, si
     scaledImg = pygame.transform.scale(img, (size, size))
     WIN.blit(scaledImg, rect)
 
-#init number class
-class Number:
+#init piece class
+class Piece:
     #init vars
     isHidden = True
     isFlagged = False
-    isBomb = False
     num = None
-    #init class
-    def __init__(self, rect: pygame.Rect, squareSize: int) -> None:
-        self.rect = rect
-        self.squareSize = squareSize
-
-    #draws the number
-    def draw(self, WIN: pygame.Surface) -> None:
-        if not(self.isHidden) and self.isFlagged:
-            putTheNumberOn(WIN, notABombImg, self.rect, self.squareSize)
-        elif self.isFlagged:
-            putTheNumberOn(WIN, flagImg, self.rect, self.squareSize)
-        elif not self.isHidden:
-            putTheNumberOn(WIN, numberImgs[self.num], self.rect, self.squareSize)
-        else:
-            putTheNumberOn(WIN, hiddenImg, self.rect, self.squareSize)
-
-#init bomb class
-class Bomb:
-    #init vars
-    isHidden = True
-    isFlagged = False
-    isBomb = True
-    win = True
     isExploded = False
+    isBomb = False
+
     #init class
     def __init__(self, rect: pygame.Rect, squareSize: int) -> None:
         self.rect = rect
         self.squareSize = squareSize
 
-    #draws the bomb to the board
+    #draws the piece
     def draw(self, WIN: pygame.Surface) -> None:
-        if self.isExploded:
-            putTheNumberOn(WIN, explodedBombImg, self.rect, self.squareSize)
-        elif self.isFlagged:
-            putTheNumberOn(WIN, flagImg, self.rect, self.squareSize)
-        elif not self.isHidden:
-            putTheNumberOn(WIN, bombImg, self.rect, self.squareSize)
+        if self.isBomb:
+            if self.isExploded:
+                putTheNumberOn(WIN, explodedBombImg, self.rect, self.squareSize)
+            elif self.isFlagged:
+                putTheNumberOn(WIN, flagImg, self.rect, self.squareSize)
+            elif not self.isHidden:
+                putTheNumberOn(WIN, bombImg, self.rect, self.squareSize)
+            else:
+                putTheNumberOn(WIN, hiddenImg, self.rect, self.squareSize)
         else:
-            putTheNumberOn(WIN, hiddenImg, self.rect, self.squareSize)
+            if not(self.isHidden) and self.isFlagged:
+                putTheNumberOn(WIN, notABombImg, self.rect, self.squareSize)
+            elif self.isFlagged:
+                putTheNumberOn(WIN, flagImg, self.rect, self.squareSize)
+            elif not self.isHidden:
+                putTheNumberOn(WIN, numberImgs[self.num], self.rect, self.squareSize)
+            else:
+                putTheNumberOn(WIN, hiddenImg, self.rect, self.squareSize)
+    
+    #turns the data given into the Piece
+    def convertData(data: tuple):
+        piece = Piece(data[0], data[1])
+        r, s, piece.isHidden, piece.isFlagged, piece.num, piece.isExploded, piece.isBomb = data
+        return piece
 
 #init board class
 class Board:
     #init class
-    def __init__(self, board_res: int, res: tuple) -> None:
+    def __init__(self, board_res: int, res: tuple, startClock: bool=True) -> None:
         global numberImgs, bombImg, hiddenImg, flagImg, explodedBombImg, notABombImg
         if (board_res**2)//10 > board_res ** 2:
             raise TooManyBombs("There can't be more bombs than pieces")
 
         self.startTime = time.time()
+        self.startClock = startClock
         self.timeSoFar = 0
         self.headerHgt = 50
         self.isEnded = False
@@ -82,19 +77,17 @@ class Board:
         self.boardWidth = res[0]
         self.boardHeight = res[1] - self.headerHgt
         self.board_res = board_res
-        self.squareSize = self.boardHeight/self.board_res
+        self.squareSize = self.boardHeight//self.board_res
         self.resetRect = pygame.Rect(self.WIDTH//2, 0, self.headerHgt, self.headerHgt)
-        self.board = [[Number(pygame.Rect(x*self.squareSize, y*self.squareSize + self.headerHgt, self.squareSize, self.squareSize), self.squareSize)
+        self.board = [[Piece(pygame.Rect(x*self.squareSize, y*self.squareSize + self.headerHgt, self.squareSize, self.squareSize), self.squareSize)
             for y in range(board_res)] for x in range(board_res)]
         
         for i in range(self.numBombs):
             while True:
                 x = random.randint(0, board_res-1)
                 y = random.randint(0, board_res-1)
-                xPos = x*self.squareSize
-                yPos = y*self.squareSize + self.headerHgt
                 if not self.board[x][y].isBomb:
-                    self.board[x][y] = Bomb(pygame.Rect(xPos, yPos, self.squareSize, self.squareSize), self.squareSize)
+                    self.board[x][y].isBomb = True
                     break
 
         for x in range(board_res):
@@ -121,7 +114,7 @@ class Board:
 
     #draws the board
     def draw(self, WIN: pygame.Surface) -> None:
-        if not self.isEnded:
+        if self.startClock and not self.isEnded:
             self.timeSoFar = time.time() - self.startTime
             
         second = self.timeSoFar % 60
@@ -180,7 +173,7 @@ class Board:
                 outY = localY >= self.board_res or localY < 0
                 outX = localX >= self.board_res or localX < 0
                 if not(center) and not(outX) and not(outY) and self.board[localX][localY].isBomb:
-                    bombs+=1    
+                    bombs+=1
         return bombs
     
     #gets the number of flags
