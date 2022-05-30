@@ -4,12 +4,11 @@
 #imports
 from threading import Thread
 from Assets.gameCode.backend.vars import *
-from Assets.gameCode.game.objects import Board
+from Assets.gameCode.backend.objects import Board
 import pygame, sys
 
 #init vars
 board = Board(BOARDSIZE, (SIZE, SIZE+50))#sets board
-clock = pygame.time.Clock()#sets clock
 
 #draws the display
 def drawDisplay():

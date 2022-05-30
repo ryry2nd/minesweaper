@@ -9,7 +9,7 @@ from Assets.gameCode.backend.vars import *
 pygame.init()
 pygame.font.init()
 
-ip = '.'.join(IP.split('.')[0:3])+'.' # pulls local ip and removes last numbers
+joinIp = '.'.join(IP.split('.')[0:3])+'.' # pulls local ip and removes last numbers
 
 #defines the input letters class
 class InputIp:
@@ -18,34 +18,37 @@ class InputIp:
         pass
     #places the text on the screen
     def placeText(self, WIN: pygame.Surface, RES: tuple):
-        WIN.blit(defaultFont.render(ip, 1, (255, 255, 255)), RES)
+        WIN.blit(defaultFont.render(joinIp, 1, (255, 255, 255)), RES)
+    #gets the ip
+    def get(self):
+        return joinIp
     #adds a key
     def addkey(self, keys: int):
-        global ip
+        global joinIp
         # if backspace is pressed remove the last number
-        if keys == pygame.K_BACKSPACE and ip != []:
-            ip = ip[0:len(ip)-1]
+        if keys == pygame.K_BACKSPACE and joinIp != []:
+            joinIp = joinIp[0:len(joinIp)-1]
         else:
             #adds a number or period if it is pressed
             if keys == pygame.K_0:
-                ip += "0"
+                joinIp += "0"
             elif keys == pygame.K_1:
-                ip += "1"
+                joinIp += "1"
             elif keys == pygame.K_2:
-                ip += "2"
+                joinIp += "2"
             elif keys == pygame.K_3:
-                ip += "3"
+                joinIp += "3"
             elif keys == pygame.K_4:
-                ip += "4"
+                joinIp += "4"
             elif keys == pygame.K_5:
                 ip += "5"
             elif keys == pygame.K_6:
-                ip += "6"
+                joinIp += "6"
             elif keys == pygame.K_7:
-                ip += "7"
+                joinIp += "7"
             elif keys == pygame.K_8:
-                ip += "8"
+                joinIp += "8"
             elif keys == pygame.K_9:
-                ip += "9"
+                joinIp += "9"
             elif keys == pygame.K_PERIOD:
-                ip += "."
+                joinIp += "."

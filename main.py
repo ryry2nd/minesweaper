@@ -3,14 +3,13 @@
 """
 #imports
 from Assets import *
-import pygame, sys
+import pygame, sys, os
 
 pygame.init()#init
 
 #init pygame window
 pygame.display.set_caption("Minesweeper")#sets caption
-pygame.display.set_icon(pygame.image.load("Assets/textures/bomb.png"))#sets icon
-clock = pygame.time.Clock()#sets clock
+pygame.display.set_icon(pygame.image.load(os.path.join("Assets", "textures", "bomb.png")))#sets icon
 
 #main function
 def main():
@@ -34,14 +33,13 @@ def main():
             
         #if the box is clocked go to the find a game code
         elif clickWindow(WIN, (300, 100), "Join a", "Server"):
-            IP = getServer()#asks for the ip
-            if IP:
-                pass
-                #client(IP)# finds the ip
+            joinIp = getServer()#asks for the ip
+            if joinIp:
+                startClient(joinIp)# finds the ip
 
         #if the box is clicked make a server
         elif clickWindow(WIN, (500, 100), "Be a", "Server"):
-            pass
+            startServer()
 
         pygame.display.update()#update the display
         clock.tick(FPS)#fps
