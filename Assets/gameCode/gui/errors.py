@@ -1,6 +1,11 @@
+"""
+    displays the errors
+"""
+#imports
 from Assets.gameCode.backend.vars import *
 import pygame
 
+#ip not found error
 def ipNotFound(WIN: pygame.Surface):
     WIN.fill((0, 0, 0))
     WIN.blit(ipFont.render("Ip not found", True, (255, 255, 255)), (0, 0))

@@ -1,16 +1,23 @@
+"""
+    server code
+"""
+#imports
 from threading import Thread
 from Assets.gameCode.backend.objects import Board
 from Assets.gameCode.backend.vars import *
 from Assets.gameCode.gui.clickWindow import clickWindow
 import socket, sys, pickle, pygame
 
+#init vars
 playerConn = []
 
+#draws the board
 def drawBoard(board: Board):
     WIN.fill((255, 255, 255))
     board.draw(WIN)
     pygame.display.update()
 
+#gets all events from the clients
 def getEvents(conn: socket.socket, board: Board):
     conn.settimeout(0.01)
     try:
@@ -24,6 +31,7 @@ def getEvents(conn: socket.socket, board: Board):
     except TimeoutError:
         pass
 
+#looks for players
 def look4Players(s: socket.socket):
     global playerConn
     while True:
@@ -35,6 +43,7 @@ def look4Players(s: socket.socket):
         playerConn.append(conn)
         conn.sendall(pickle.dumps((BOARDSIZE, (SIZE, SIZE+50))))
 
+#converts the board into just the data instead of sending the entire class
 def sendBoard(board: Board) -> list:
     retBoard = []
     for x in range(len(board)):
@@ -47,18 +56,22 @@ def sendBoard(board: Board) -> list:
                 retBoard[x].append((piece.rect, piece.squareSize, piece.isHidden, piece.isFlagged, piece.num, piece.isExploded, piece.isBomb))
     return retBoard
 
+#starts the server
 def startServer():
+    #init vars
     global playerConn
     playerConn.clear()
     board = Board(BOARDSIZE, (SIZE, SIZE+50))
-
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
+    #connects the server
     s.bind((IP, PORT))
     s.listen()
 
+    #starts looking for players
     Thread(target=look4Players, args=(s, )).start()
 
+    #starts up player join screen
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -80,16 +93,23 @@ def startServer():
             break
         pygame.display.update()
     
+    #stops looking
     s.close()
+
+    #tells the players to stop loading
     for conn in playerConn:
         try:
             conn.send(pickle.dumps(False))
         except ConnectionResetError:
             playerConn.remove(conn)
     
+    #starts game
     while True:
+        #starts drawing the board
         drawThread = Thread(target=drawBoard, args=(board, ))
         drawThread.start()
+
+        #sends the board data to the clients
         for conn in playerConn:
             try:
                 conn.sendall(pickle.dumps((sendBoard(board.board), board.isEnded, board.timeSoFar)))
@@ -118,11 +138,13 @@ def startServer():
                 elif event.key == pygame.K_ESCAPE:
                     break
         
+        #gets the player events and acts accordingly
         for conn in playerConn:
             getEvents(conn, board)
 
-        clock.tick(FPS)
-        drawThread.join()
+        clock.tick(FPS)#fps
+        drawThread.join()#joins the draw thread
     
+    #stops the connections
     for conn in playerConn:
         conn.close()
