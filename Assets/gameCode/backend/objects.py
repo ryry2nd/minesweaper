@@ -2,7 +2,6 @@
     sets the objects
 """
 #imports
-from msilib.schema import Class
 from Assets.gameCode.backend.vars import *
 import pygame, random, time
 
